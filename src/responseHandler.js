@@ -1,35 +1,39 @@
 const userData = { users: {} };
 
 // Generic version to write all the others with
-const respondJSON = (req, res, status, object) => {
+const respondJSON = (req, res, status, object, type) => {
   res.writeHead(status, { 'Content-Type': 'application/json' });
-  res.write(JSON.stringify(object));
+  if (type === 'GET') res.write(JSON.stringify(object));
   res.end();
 };
 
 // Fxn for getting the users actively stored
-const getUsers = (req, res) => {
+const getUsers = (req, res, type) => {
+  if (type === 'HEAD') respondJSON(req, res, 200);
   respondJSON(req, res, 200, userData);
 };
 
 // Fxn for client to add users to our user set
 const addUser = (req, res, params) => {
+  // Catch if the params are invalid and shoot a bad request error if they are
   if (!params.name || !params.age) {
     badRequest(req, res, params);
   }
-}
 
-// Fxn for a bad request
-const badRequest = (req, res, params) => {
   const obj = {
-    id: 'badRequest',
-    message: 'Missing valid query params',
+    id: 'success',
   };
 
-  // Update the message based on what's missing
-  if (!params.name && !params.age) obj.message = 'Missing both age and name parameters.';
-  else if (!params.name) obj.message = 'Missing name parameter.';
-  else if (!params.age) obj.message = 'Missing age parameter.';
+  userData[params.user] = params.age;
+  respondJSON(req, res, 200, obj);
+};
+
+// Fxn for a bad request
+const badRequest = (req, res) => {
+  const obj = {
+    id: 'badRequest',
+    message: 'Name and age parameters are both required.',
+  };
 
   respondJSON(req, res, 400, obj);
 };
@@ -55,24 +59,6 @@ const forbidden = (req, res) => {
   respondJSON(req, res, 403, obj);
 };
 
-// Fxn for internal server error handling
-const internal = (req, res) => {
-  const obj = {
-    id: 'internalError',
-    message: 'Internal server error. Something went wrong.',
-  };
-  respondJSON(req, res, 500, obj);
-};
-
-// Fxn for when user requests features not yet implemented
-const notImplemented = (req, res) => {
-  const obj = {
-    id: 'notImplemented',
-    message: 'Feature not yet implemented. Check again later for updated content.',
-  };
-  respondJSON(req, res, 501, obj);
-};
-
 // Fxn for when user requests assets that don't exist
 const missing = (req, res) => {
   const obj = {
@@ -88,7 +74,6 @@ module.exports = {
   badRequest,
   unauthorized,
   forbidden,
-  internal,
-  notImplemented,
   missing,
+  addUser,
 };

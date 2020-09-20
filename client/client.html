@@ -6,6 +6,10 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
+    // Getting refs to mandatory items
+    const name = document.querySelector('#nameField');
+    const age = document.querySelector('#ageField');
+
     // Adding user
     const sendAddUser = (e) => {
       // prevent page refresh
@@ -16,18 +20,24 @@
       xhr.open('POST', '/addUser');
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      // do something w/ the response
+      xhr.onresponse = handleResponse;
       let content = `name=${name.value}&age=${age.value}`;
-      xhr.send(body);
+      xhr.send(content);
 
       // prevent bubbling
       return false;
     }
-
+    
+    const handleResponse = (xhr) => {
+      let responseJSON = xhr.response ? JSON.parse(xhr.response) : null;
+      console.log(responseJSON);
+    }
     // Initializing components and bindings when the user opens the page
     window.onload = () => {
-      // Bind some stuff
+      document.querySelector('#nameForm').onsubmit = sendAddUser;
     }
+
+
 
   </script>
 </head>

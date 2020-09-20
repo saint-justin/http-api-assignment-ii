@@ -13,20 +13,20 @@ const urlStruct = {
     '/getUsers': responseHandler.getUsers,
   },
   POST: {
-    user: 'garbage',
+    addUser: responseHandler.addUser,
   },
 };
 
 const onRequest = (req, res) => {
   const parsedUrl = url.parse(req.url);
-  // const params = query.parse(parsedUrl.query);
+  const params = query.parse(parsedUrl.query);
   const type = req.headers.accept.split(',')[0] || 'application/json';
 
   // Prints info about the request
   console.log(`TYPE: ${type}    PATH: '${parsedUrl.pathname}'    METHOD: ${req.method}`);
-
+  if (params) console.log(params);
   if (urlStruct[req.method][parsedUrl.pathname]) {
-    urlStruct[req.method][parsedUrl.pathname](req, res);
+    urlStruct[req.method][parsedUrl.pathname](req, res, params);
   } else {
     responseHandler.missing(req, res);
   }

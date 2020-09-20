@@ -8,9 +8,21 @@ const respondJSON = (req, res, status, object, type) => {
 };
 
 // Fxn for getting the users actively stored
-const getUsers = (req, res, type) => {
-  if (type === 'HEAD') respondJSON(req, res, 200);
+const getUsers = (req, res) => {
+  console.log('running getUser');
+
+  if (req.method === 'HEAD') respondJSON(req, res, 200, null, req.method);
   respondJSON(req, res, 200, userData);
+};
+
+// Fxn for a bad request
+const badRequest = (req, res) => {
+  const obj = {
+    id: 'badRequest',
+    message: 'Name and age parameters are both required.',
+  };
+
+  respondJSON(req, res, 400, obj);
 };
 
 // Fxn for client to add users to our user set
@@ -26,16 +38,6 @@ const addUser = (req, res, params) => {
 
   userData[params.user] = params.age;
   respondJSON(req, res, 200, obj);
-};
-
-// Fxn for a bad request
-const badRequest = (req, res) => {
-  const obj = {
-    id: 'badRequest',
-    message: 'Name and age parameters are both required.',
-  };
-
-  respondJSON(req, res, 400, obj);
 };
 
 // Fxn for user requesting data when not logged in

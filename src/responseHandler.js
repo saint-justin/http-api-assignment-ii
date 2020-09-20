@@ -1,4 +1,4 @@
-const users = { users: {} };
+const userData = { users: {} };
 
 // Generic version to write all the others with
 const respondJSON = (req, res, status, object) => {
@@ -9,17 +9,27 @@ const respondJSON = (req, res, status, object) => {
 
 // Fxn for getting the users actively stored
 const getUsers = (req, res) => {
-  respondJSON(req, res, 200, users);
+  respondJSON(req, res, 200, userData);
 };
+
+// Fxn for client to add users to our user set
+const addUser = (req, res, params) => {
+  if (!params.name || !params.age) {
+    badRequest(req, res, params);
+  }
+}
 
 // Fxn for a bad request
 const badRequest = (req, res, params) => {
   const obj = {
     id: 'badRequest',
-    message: 'Missing valid query param set to true',
+    message: 'Missing valid query params',
   };
 
-  if (params.valid === 'yes') obj.message = 'This request has the required params';
+  // Update the message based on what's missing
+  if (!params.name && !params.age) obj.message = 'Missing both age and name parameters.';
+  else if (!params.name) obj.message = 'Missing name parameter.';
+  else if (!params.age) obj.message = 'Missing age parameter.';
 
   respondJSON(req, res, 400, obj);
 };

@@ -84,7 +84,7 @@
           break;
         case 400:
           h1.textContent = 'Bad Request';
-          if(methodField.value === 'GET') p.textContent = `Message: ${responseJSON.message}`;
+          p.textContent = `Message: ${responseJSON.message}`;
           break;
         case 404:
           h1.textContent = 'Resource Not Found';

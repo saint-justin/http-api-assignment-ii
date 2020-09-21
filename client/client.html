@@ -15,23 +15,32 @@
       // prevent page refresh
       e.preventDefault();
 
-      // create and sent the request
+      // create the request
       let xhr = new XMLHttpRequest();
-      xhr.open('POST', '/addUser');
+      xhr.open('POST', `/addUser`);
       xhr.setRequestHeader('Accept', 'application/json');
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      xhr.onresponse = handleResponse;
-      let content = `name=${name.value}&age=${age.value}`;
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = () => handleResponse(xhr);
+
+      let content = `name="${name.value}"&age="${age.value}"`;
+      console.log('POST CONTENT: ');
+      console.log(content); 
+
+      // send the request
       xhr.send(content);
 
       // prevent bubbling
       return false;
     }
     
+    // Handlers responses from POST requests
     const handleResponse = (xhr) => {
       let responseJSON = xhr.response ? JSON.parse(xhr.response) : null;
       console.log(responseJSON);
     }
+
+
+
     // Initializing components and bindings when the user opens the page
     window.onload = () => {
       document.querySelector('#nameForm').onsubmit = sendAddUser;

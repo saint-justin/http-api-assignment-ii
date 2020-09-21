@@ -3,32 +3,55 @@ const url = require('url');
 const query = require('querystring');
 
 const htmlHandler = require('./htmlHandler.js');
-const responseHandler = require('./responseHandler.js');
+const jsonHandler = require('./jsonHandler.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 const urlStruct = {
-  GET: {
-    '/': htmlHandler.getClient,
-    '/style.css': htmlHandler.getStyle,
-    '/getUsers': responseHandler.getUsers,
-  },
-  POST: {
-    addUser: responseHandler.addUser,
-  },
+  '/': htmlHandler.getClient,
+  '/style.css': htmlHandler.getStyle,
+  '/getUsers': jsonHandler.getUsers,
+};
+
+const handlePost = (req, res, parsedUrl) => {
+  if (parsedUrl.pathname === '/addUser') {
+    const body = [];
+
+    req.on('error', (err) => {
+      console.dir(err);
+      res.statusCode = 400;
+      res.end();
+    });
+
+    req.on('data', (chunk) => {
+      body.push(chunk);
+    });
+
+    req.on('end', () => {
+      const bodyString = Buffer.concat(body).toString();
+      const bodyParams = query.parse(bodyString);
+      jsonHandler.addUser(req, res, bodyParams);
+    });
+  } else {
+    jsonHandler.missing(req, res);
+  }
 };
 
 const onRequest = (req, res) => {
   const parsedUrl = url.parse(req.url);
-  const params = query.parse(parsedUrl.query);
-  const type = req.headers.accept.split(',')[0] || 'application/json';
+  console.log('REQUEST URL: ', req.url);
 
   // Prints info about the request
-  console.log(`TYPE: ${type}    PATH: '${parsedUrl.pathname}'    METHOD: ${req.method}`);
-  if (params) console.log(params);
-  if (urlStruct[req.method][parsedUrl.pathname]) {
-    urlStruct[req.method][parsedUrl.pathname](req, res, params);
+  console.log(`PATH: '${parsedUrl.pathname}'    METHOD: ${req.method}`);
+
+  // Handle cases for get, post, and head requests
+  if (req.method === 'GET' && urlStruct[parsedUrl.pathname]) {
+    urlStruct[parsedUrl.pathname](req, res);
+  } else if (req.method === 'HEAD' && urlStruct[parsedUrl.pathname]) {
+    urlStruct[parsedUrl.pathname](req, res);
+  } else if (req.method === 'POST') {
+    handlePost(req, res, parsedUrl);
   } else {
-    responseHandler.missing(req, res);
+    jsonHandler.missing(req, res);
   }
 };
 

@@ -9,7 +9,18 @@
     // Getting refs to mandatory items
     const name = document.querySelector('#nameField');
     const age = document.querySelector('#ageField');
+    const urlField = document.querySelector('#urlField');
+    const methodField = document.querySelector('#methodSelect');
 
+    // Helper Fxn's --------------------------------------------------
+    // Fxn for clearing all children from a given node
+    const clearChildren = (node) => {
+      while(node.children.length > 0){
+        node.removeChild(node.lastElementChild);
+      }
+    }
+
+    // Core Fxn's ----------------------------------------------------
     // Adding user
     const sendAddUser = (e) => {
       // prevent page refresh
@@ -32,9 +43,22 @@
       // prevent bubbling
       return false;
     }
+
+    const sendGetReq = (e) => {
+      // prevent page refresh
+      e.preventDefault();
+
+      // create the request
+      let xhr = new XMLHttpRequest();
+      xhr.open(methodField.value, urlField.value);
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.onload = () => handleResponse(xhr);
+      xhr.send();
+    }
     
     // Handlers responses from POST requests
     const handleResponse = (xhr) => {
+      clearChildren();
       let responseJSON = xhr.response ? JSON.parse(xhr.response) : null;
       console.log(responseJSON);
     }
@@ -44,6 +68,7 @@
     // Initializing components and bindings when the user opens the page
     window.onload = () => {
       document.querySelector('#nameForm').onsubmit = sendAddUser;
+      document.querySelector('#userForm').onsubmit = sendGetReq;
     }
 
 

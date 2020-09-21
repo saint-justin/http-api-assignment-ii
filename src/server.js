@@ -40,7 +40,7 @@ const onRequest = (req, res) => {
   const parsedUrl = url.parse(req.url);
 
   // Prints info about the request
-  console.log(`PATH: '${parsedUrl.pathname}'    METHOD: ${req.method}`);
+  // console.log(`PATH: '${parsedUrl.pathname}'    METHOD: ${req.method}`);
 
   // Handle cases for get, post, and head requests
   if ((req.method === 'GET' || req.method === 'HEAD') && urlStruct[parsedUrl.pathname]) {

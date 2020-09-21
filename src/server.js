@@ -38,15 +38,12 @@ const handlePost = (req, res, parsedUrl) => {
 
 const onRequest = (req, res) => {
   const parsedUrl = url.parse(req.url);
-  console.log('REQUEST URL: ', req.url);
 
   // Prints info about the request
   console.log(`PATH: '${parsedUrl.pathname}'    METHOD: ${req.method}`);
 
   // Handle cases for get, post, and head requests
-  if (req.method === 'GET' && urlStruct[parsedUrl.pathname]) {
-    urlStruct[parsedUrl.pathname](req, res);
-  } else if (req.method === 'HEAD' && urlStruct[parsedUrl.pathname]) {
+  if ((req.method === 'GET' || req.method === 'HEAD') && urlStruct[parsedUrl.pathname]) {
     urlStruct[parsedUrl.pathname](req, res);
   } else if (req.method === 'POST') {
     handlePost(req, res, parsedUrl);
